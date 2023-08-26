@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Чатик</title>
+</head>
+<body>
+<link href="files/css.css">
+    <style>
+    [id=message]{border: 1mm ridge;}
+
+    </style>
+    <form id="message-form" action="">
+        Сообщение: <input type="text" id="message-input" />
+        <input type="submit" value="Отправить" />
+        <input type="submit" value="Выход" onclick="exitRoom()"/>
+    </form>
+    <br>
+    <b>Последние сообщения:</b>
+    <br>
+    <div id="messages">
+        {%for i in range(0, leng)%}
+            <p><div id="message"><b>{{old[i][1]}}</b> ({{old[i][3]}})</p>
+            {{old[i][2]}}</div>
+        {%endfor%}
+    </div>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.min.js"></script>
+    <script type="text/javascript">
+
+        function getCookie(name) {
+            var matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
+            return matches ? decodeURIComponent(matches[1]) : undefined;
+        }
+        var socket = io.connect();
+        var messageForm = document.getElementById('message-form');
+        var messageInput = document.getElementById('message-input');
+        var messages = document.getElementById('messages');
+
+        messageForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            socket.send(getCookie('username') + ", " + messageInput.value);
+            messageInput.value = '';
+        });
+
+        socket.on('message', function(message) {
+            var messageElement = document.createElement('p');
+            messageElement.setAttribute("id", "message");
+            messageElement.innerHTML = message;
+            messages.prepend(messageElement);
+        });
+        function exitRoom()
+        {
+            document.cookie.split(";").forEach(function(c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); });
+            location.reload();
+        }
+
+    </script>
+</body>
+</html>
