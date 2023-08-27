@@ -2,16 +2,63 @@
 <html>
 <head>
     <title>Вход</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Link Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- Link custom CSS -->
+    <link rel="stylesheet" href="files/css.css">
+
+    <!-- Inline CSS -->
+    <style>
+        body {
+            padding: 20px;
+        }
+
+        form {
+            max-width: 400px;
+            margin: auto;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        .message {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-<link href="files/css.css">
+    <div class="container">
+        <div class="form-group">
     <form id="login-form" action="">
-        Ник: <input type="text" id="name-input" />
-        Пасс-код: <input type="text" id="code-input" />
-        <input type="submit" value="Send" onclick="send()"/>
+        Ник: <input type="text" class="form-control" id="name-input"/>
+        Пасс-код: <input type="password" id="code-input" class="form-control"/>
+        <input type="submit" value="Войти" onclick="send()" class="btn btn-primary"/>
     </form>
-    <br>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.min.js"></script>
+        <div class="message">
+            {{ old }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Link Socket.io -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.min.js"></script>
     <script type="text/javascript">
         function send(){
             var messageForm = document.getElementById('login-form');
@@ -27,5 +74,10 @@
             });
             }
     </script>
+
+    <!-- Link Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

@@ -2,34 +2,66 @@
 <html>
 <head>
     <title>Чатик</title>
-</head>
-<body>
-<link href="files/css.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Link Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- Link custom CSS -->
+    <link rel="stylesheet" href="files/css.css">
+
+    <!-- Inline CSS -->
     <style>
-    [id=message]{border: 1mm ridge;}
+        #message {
+            border: 1mm ridge;
+        }
 
+        .message {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .message p {
+            margin: 0;
+        }
     </style>
-    <form id="message-form" action="">
-        Сообщение: <input type="text" id="message-input" />
-        <input type="submit" value="Отправить" />
-        <input type="submit" value="Выход" onclick="exitRoom()"/>
-    </form>
-    <br>
-    <b>Последние сообщения:</b>
-    <br>
-    <div id="messages">
-        {%for i in range(0, leng)%}
-            <p><div id="message"><b>{{old[i][1]}}</b> ({{old[i][3]}})</p>
-            {{old[i][2]}}</div>
-        {%endfor%}
-    </div>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.min.js"></script>
-    <script type="text/javascript">
+</head>
 
+<body>
+<br>
+    <div class="container">
+        <form id="message-form" action="">
+            <div class="form-group">
+                <label for="message-input">Сообщение:</label>
+                <input type="text" class="form-control" id="message-input">
+            </div>
+            <button type="submit" class="btn btn-primary">Отправить</button>
+            <button type="button" class="btn btn-danger" onclick="exitRoom()">Выход</button>
+        </form>
+        <br>
+        <b>Последние сообщения:</b>
+        <br>
+        <div id="messages">
+            {% for i in range(0, leng) %}
+                <div class="message">
+                    <p><b>{{ old[i][1] }}</b> ({{ old[i][3] }})</p>
+                    <p>{{ old[i][2] }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Link Socket.io -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.min.js"></script>
+
+    <script type="text/javascript">
         function getCookie(name) {
             var matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
             return matches ? decodeURIComponent(matches[1]) : undefined;
         }
+
         var socket = io.connect();
         var messageForm = document.getElementById('message-form');
         var messageInput = document.getElementById('message-input');
@@ -37,22 +69,28 @@
 
         messageForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            socket.send(getCookie('username') + ", " + messageInput.value);
+            socket.send(messageInput.value);
             messageInput.value = '';
         });
 
-        socket.on('message', function(message) {
-            var messageElement = document.createElement('p');
-            messageElement.setAttribute("id", "message");
+         socket.on('message', function(message) {
+            var messageElement = document.createElement('div');
+            messageElement.setAttribute("class", "message");
             messageElement.innerHTML = message;
             messages.prepend(messageElement);
         });
-        function exitRoom()
-        {
-            document.cookie.split(";").forEach(function(c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); });
+
+        function exitRoom() {
+            document.cookie.split(';').forEach(function(c) {
+                document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
+            });
             location.reload();
         }
-
     </script>
+
+    <!-- Link Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

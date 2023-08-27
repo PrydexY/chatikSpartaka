@@ -11,7 +11,11 @@ app.config['SECRET_KEY'] = 'chatik'
 socketio = SocketIO(app)
 black_list = []
 keys = ["aboba"]
+admin_keys = ["aboba21062009"]
 hash_keys = [str(hashlib.md5(keys[0].encode()).hexdigest())]
+admin_hash_keys = [str(hashlib.md5(admin_keys[0].encode()).hexdigest())]
+hash_keys += admin_hash_keys
+print(hash_keys)
 
 messages = messages_data_base()
 
@@ -26,9 +30,10 @@ def index():
 @app.route('/', methods=["POST"])
 def index_post():
     data = ast.literal_eval(request.data.decode("UTF-8"))
-    req = render_template('login.html', old="Неверный пасс-код!")
-    print(data["pass_code"], keys)
-    if data["pass_code"] in keys:
+    req = render_template('login.html', old="<b>Неверный пасс-код!</b>")
+    data["pass_code"].strip()
+    print(data["pass_code"].strip(), keys)
+    if str(hashlib.md5(data["pass_code"].encode()).hexdigest()) in hash_keys:
         req = redirect("")
         hashcode = hashlib.md5(data["pass_code"].encode()).hexdigest()
         req.set_cookie("username", data["username"])
@@ -42,26 +47,35 @@ def login():
     return render_template('login.html', old="")
 
 
+@app.route("/admin")
+def admin():
+    if request.cookies.get("session") in admin_hash_keys:
+        index()
+    return render_template('admin.html', old="")
+
+
 @socketio.on('message')
 def handle_message(message):
     if not request.cookies.get("session") in hash_keys:
         return login()
-    message_text = message.split(", ")[1]
-    name = message.split(", ")[0]
-    messages.add_message(name, message_text)
-    print(request.remote_addr, name)
+    message_text = message
+    messages.add_message(request.cookies["username"], message_text)
+    print(request.remote_addr, request.cookies["username"])
     if not request.remote_addr in black_list:
-        emit('message', "<b>" + name + "</b> (" + str(datetime.datetime.now().hour) + ":" + str(
-            datetime.datetime.now().minute) + ":" + str(
-            datetime.datetime.now().second) + ")<br><br>" + message_text,
+        emit('message', "<p><b>" + request.cookies["username"] + "</b> (" + str(
+            datetime.datetime.now()) + ")</p><p>" + message_text + "</p>",
              broadcast=True)
 
 
 @app.route("/files/<path:filename>")
 def file(filename):
+    print(123123123123)
     if "/" in filename or "\\" in filename:
         return ""
-    return send_file("files/" + filename)
+    try:
+        return send_file("files/" + filename)
+    except:
+        return ""
 
 
 if __name__ == '__main__':
