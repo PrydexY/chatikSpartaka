@@ -21,9 +21,9 @@ messages = messages_data_base()
 
 
 @app.route('/')
-def index():
+def index(status=""):
     if not request.cookies.get("session") in hash_keys:
-        return login()
+        return login(status)
     return render_template('index.html', old=messages.get_messages(), leng=len(messages.get_messages()))
 
 
@@ -41,23 +41,24 @@ def index_post():
     return req
 
 
-def login():
+def login(status):
     if request.cookies.get("session") in hash_keys:
         index()
-    return render_template('login.html', old="")
+    return render_template('login.html', old=status)
 
 
 @app.route("/admin")
 def admin():
-    if request.cookies.get("session") in admin_hash_keys:
-        index()
+    print(request.cookies.get("session"), admin_hash_keys)
+    if not request.cookies.get("session") in admin_hash_keys:
+        return ""
     return render_template('admin.html', old="")
 
 
 @socketio.on('message')
 def handle_message(message):
     if not request.cookies.get("session") in hash_keys:
-        return login()
+        return login("")
     message_text = message
     messages.add_message(request.cookies["username"], message_text)
     print(request.remote_addr, request.cookies["username"])
@@ -69,7 +70,6 @@ def handle_message(message):
 
 @app.route("/files/<path:filename>")
 def file(filename):
-    print(123123123123)
     if "/" in filename or "\\" in filename:
         return ""
     try:
